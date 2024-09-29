@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from .config import config
 import coloredlogs, logging
 from .database import Base, engine
+from .models import *
 
 
 def create_app():
@@ -14,8 +15,7 @@ def create_app():
     coloredlogs.install(level="INFO", logger=logging.getLogger(), isatty=True)
 
     # try create all models
-    Base.metadata.create_all(bind=engine)
-
+    models.Base.metadata.create_all(bind=engine)
     # db = SessionLocal()  # We will create a database session using a SessionLocal class.
     # app.db = db  # Add the database session to our FastAPI application
     # db.init_app(app)
