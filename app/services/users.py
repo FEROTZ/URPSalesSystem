@@ -1,91 +1,91 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from .. import models, schemas
-from passlib.context import CryptContext
-from .roles import get_none_admin_role
+from ..exceptions.user_exception import UserException
+from .. import schemas
+from ..models.Users import User
+# from .roles import get_none_admin_role
 import re
 
+class UserService:
 
-pswd_context = CryptContext(
-    schemes=['bcrypt'],
-    default='bcrypt',
-    bcrypt__rounds=12,
-)
+    def get(user_id: int):
+        get_user = User.find_one(id=user_id, status='active')
 
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id, models.User.status == 'active').first()
+        if not get_user:
+            UserException.not_found()
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+        response = {}
+        response['success'] = True
+        response['message'] = "User fetched successfully"
+        response['payload'] = get_user.__dict__
 
-def get_users(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.User).filter(models.User.status == 'active').offset(skip).limit(limit).all()
-
-def create_user(db: Session, user: schemas.UserCreate):
-    hashed_password = hash_password(user.password)
-    random_role = get_none_admin_role(db)
-
-    new_user = models.User(
-        username    = user.username, 
-        email       = user.email,
-        password    = hashed_password,
-        role_id     = random_role.id,
-    )
-        
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return new_user
+        return response
 
 
-def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
-    user = get_user(db, user_id=user_id)
-    if not user:
-        return None
-    update_user = user_update.model_dump(exclude_unset=True)
-    
-    if 'password' in update_user:
-        update_user['password'] = hash_password(update_user['password'])
-        
-    for key, value in update_user.items():
-        setattr(user, key, value)
-        
-    db.commit()
-    db.refresh(user)
-    return user
+    def get_all(skip: int = 0, limit: int = 10):
+        get_all_users = User.find(limit=limit, skip=skip)
 
-def deactive_user(db: Session, user_id: int):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        return None
-    
-    if user.status == schemas.UserStatusType.inactive:
-        return user
+        users = []
+        for user in get_all_users:
+            users.append(user.__dict__)
 
-    user.status = schemas.UserStatusType.inactive
-    db.commit()
-    db.refresh(user)
-    return user
- 
-def hash_password(password: str) -> str:
-    return pswd_context.hash(password)
+        response = {}
+        response['success'] = True
+        response['message'] = "Users was obtained successfully"
+        response['payload'] = users
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pswd_context.verify(plain_password, hashed_password)
+        return response
 
-def validate_password(password: str) -> dict:
-    errors = []
-    
-    if not re.search(r'[a-z]', password):
-        errors.append("one lowercase letter")
-    if not re.search(r'[A-Z]', password):
-        errors.append("one uppercase letter")
-    if not re.search(r'\d', password):
-        errors.append("one number")
-        
-    if errors:
-        error_message = f"Password should contain at least {', '.join(errors)}"
-        return {"message": error_message, "valid": False}
-    
-    return {"valid": True}
+    def create(body: schemas.UserCreate):
+        exist = User.find_one(email=body['email'], status='active')
+        if exist:
+            UserException.user_exist()
+
+        new_user = User.save(**body)
+
+        if not new_user:
+            UserException.not_created()
+
+        user = User.find_one(id=new_user.id)
+
+        response = {}
+        response['success'] = True
+        response['message'] = "User created successfully"
+        response['payload'] = user.__dict__
+
+        return response
+
+    # def update(body: schemas.UserUpdate):
+    #     get_user = User.find_one(id = body['id'])
+    #     if not get_user:
+    #         UserException.not_found()
+
+    #     if validateAttribute(body, 'active'):
+    #         body['deleted_at'] = None
+    #         if not body['active']:
+    #             body['deleted_at'] = datetime.now()
+
+    #     update_user = User.update(**body)
+    #     update_user = user_update.model_dump(exclude_unset=True)
+
+    #     if 'password' in update_user:
+    #         update_user['password'] = hash_password(update_user['password'])
+
+    #     for key, value in update_user.items():
+    #         setattr(user, key, value)
+
+    #     db.commit()
+    #     db.refresh(user)
+    #     return user
+
+    # def deactive_user(db: Session, user_id: int):
+    #     user = db.query(models.User).filter(models.User.id == user_id).first()
+    #     if not user:
+    #         return None
+
+    #     if user.status == schemas.UserStatusType.inactive:
+    #         return user
+
+    #     user.status = schemas.UserStatusType.inactive
+    #     db.commit()
+    #     db.refresh(user)
+    #     return user

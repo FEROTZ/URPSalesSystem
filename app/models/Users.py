@@ -32,8 +32,8 @@ class User(Base):
     def role_name(self):
         return self.role.name
 
-    def __repr__(self):
-        return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
+    # def __repr__(self):
+    #     return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
 
     def save(**kwargs):
         try:
@@ -51,9 +51,9 @@ class User(Base):
             pass
 
 
-    def find():
+    def find(limit:int = 10, skip:int = 0):
         try:
-            return db.query(User).filter_by(User.status == 'active').all()
+            return db.query(User).filter_by(User.status == 'active').offset(skip).limit(limit).all()
         except Exception as error:
             print(error)
             return {}
@@ -77,6 +77,7 @@ class User(Base):
             )
             db.commit()
             db.refresh(user)
+            return user
         except Exception as error:
             print(error)
             db.rollback()
@@ -93,6 +94,7 @@ class User(Base):
             )
             db.commit()
             db.refresh(user)
+            return user
         except exc.SQLAlchemyError as error:
             print(error)
             db.rollback()

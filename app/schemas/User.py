@@ -11,7 +11,7 @@ class UserStatusType(str, Enum):
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
-    
+
     @field_validator('email')
     def normalize_email(cls, v: EmailStr):
         return v.lower()
@@ -19,11 +19,11 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=100)
-    
+
     class Config:
         orm_mode = True
 
-        
+
 class UserUpdate(UserBase):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -44,7 +44,7 @@ class UserResponse(UserBase):
     status: UserStatusType
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         orm_mode = True
 
@@ -57,7 +57,7 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-    
+
 
 class TokenData(BaseModel):
     username: str | None = None
