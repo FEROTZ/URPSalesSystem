@@ -5,7 +5,6 @@ from .database import Base, engine
 
 
 def create_app():
-    # Flask start
     app = FastAPI()
     app.debug = config.SERVER_DEBUG
 
@@ -23,14 +22,14 @@ def create_app():
 
     from .controllers import (
         User,
-        Role,
-        Permission,
+        # Role,
+        # Permission,
         # RolePermission,
     )
 
     app.include_router(User.router, prefix="/api/v1/users", tags=["Users"])
-    app.include_router(Role.router, prefix="/api/v1/roles", tags=["Roles"])
-    app.include_router(Permission.router, prefix="/api/v1/permissions", tags=["Permissions"])
+    # app.include_router(Role.router, prefix="/api/v1/roles", tags=["Roles"])
+    # app.include_router(Permission.router, prefix="/api/v1/permissions", tags=["Permissions"])
 
 
     # db.create_all()  # Create database tables for our data models
