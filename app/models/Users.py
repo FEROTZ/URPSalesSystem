@@ -1,10 +1,9 @@
 from sqlalchemy import Column, Integer, String, Enum, DateTime, ForeignKey, exc
 from sqlalchemy.orm import relationship, Session
 from datetime import datetime
-from ..database import Base, get_db
+from ..database import Base
 from passlib.context import CryptContext
 
-db: Session = get_db()
 
 pswd_context = CryptContext(
     schemes=['bcrypt'],
@@ -35,13 +34,13 @@ class User(Base):
     # def __repr__(self):
     #     return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
 
-    def save(**kwargs):
+    def save(db:Session, **kwargs):
         try:
             user = User(**kwargs)
-            password = User.hash_password(user['password'])
-            user['password'] = password
-            db.session.add(user)
-            db.session.commit()
+            hashed_password = User.hash_password(kwargs['password'])
+            user.password = hashed_password
+            db.add(user)
+            db.commit()
             db.refresh(user)
             return user
         except Exception as error:
@@ -51,16 +50,16 @@ class User(Base):
             pass
 
 
-    def find(limit:int = 10, skip:int = 0):
+    def find(db: Session):
         try:
-            return db.query(User).filter_by(User.status == 'active').offset(skip).limit(limit).all()
+            return db.query(User).filter_by(status = 'active').all()
         except Exception as error:
             print(error)
             return {}
         finally:
             pass
 
-    def find_one(**kwargs):
+    def find_one(db: Session, **kwargs):
         try:
             return db.query(User).filter_by(**kwargs).first()
         except exc.SQLAlchemyError as error:

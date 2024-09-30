@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 # from ..core.auth import authenticate_user, create_access_token, oauth2_scheme
-from ..dto import createUserInputSchema, getUserOutputSchema, UserSchema
+from ..dto import *
 from app.services.users import UserService
 from app.schemas import UserResponse, UserCreate, Token, UserUpdate, UserInactiveResponse
 from ..database import get_db
@@ -13,51 +13,44 @@ from typing import List
 class User():
     router = APIRouter()
 
-    @router.get('/', response_model=List[UserResponse])
-    async def list_users(
-        skip: int = Query(0, ge=0, description='Number of users to skip.'),
-        limit: int = Query(10, gt=0, le=100, description='Number of users to return.'),
-    ):
-        users = UserService.get_all(skip=skip, limit=limit)
-        if not users:
-            raise HTTPException(status_code=204, detail="No users found.")
-        return users
+    @router.get('/', response_model = GetAllUsersOutputSchema)
+    def list_users(db: Session = Depends(get_db)):
+        return UserService.get_all(db=db)
 
-    @router.get('/{user_id}', response_model=UserResponse)
-    async def user_details(user_id: int):
-        return user
+    @router.get('/{user_id}', response_model = GetUserOutputSchema)
+    def user_details(user_id: int, db: Session = Depends(get_db)):
+        return UserService.get(db = db, user_id = user_id)
 
 
-    @router.post('/register', response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-    async def create_user(request:Request,  user: UserCreate, db: Session = Depends(get_db)):
+    @router.post('/register', response_model = CreateUserOutputSchema, status_code = status.HTTP_201_CREATED)
+    def create_user(body: CreateUserInputSchema, db: Session = Depends(get_db)):
+        return UserService.create(body = body, db = db)
 
-        return UserService.create_user(db, user=user)
 
+    # @router.put('/{user_id}', response_model=UserResponse)
+    # async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
+    #     if user_update.password:
+    #         password_validation = UserService.validate_password(user_update.password)
 
-    @router.put('/{user_id}', response_model=UserResponse)
-    async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
-        if user_update.password:
-            password_validation = UserService.validate_password(user_update.password)
-            
-            if not password_validation['valid']:
-                raise HTTPException(status_code=400, detail=password_validation['message'])
+    #         if not password_validation['valid']:
+    #             raise HTTPException(status_code=400, detail=password_validation['message'])
 
-        return UserService.update_user(db, user_id=user_id, user_update=user_update)
-        
-        if not update_user:
-            raise HTTPException(status_code=404, detail="User not found.")
+    #     return UserService.update_user(db, user_id=user_id, user_update=user_update)
 
-        return update_user
+    #     if not update_user:
+    #         raise HTTPException(status_code=404, detail="User not found.")
+
+    #     return update_user
 
 
     # @router.delete('/{user_id}', response_model=UserInactiveResponse)
     # def delete_user(user_id: int, db: Session = Depends(get_db)):
-        user = UserService.deactive_user(db, user_id=user_id)
-        
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found.")
-        
-        return user
+        # user = UserService.deactive_user(db, user_id=user_id)
+
+        # if not user:
+        #     raise HTTPException(status_code=404, detail="User not found.")
+
+        # return user
 
 
     # @router.post('/login', response_model=Token)
@@ -69,12 +62,12 @@ class User():
     #             detail = "Incorrect email or password",
     #             headers = {"WWW-Authenticate": "Bearer"},
     #         )
-            
+
     #     access_token_expires = timedelta(minutes = settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     #     access_token = create_access_token(
     #         data = {"sub": user.email}, expires_delta = access_token_expires
     #     )
-        
+
     #     return {"access_token": access_token, "token_type": "bearer"}
 
 

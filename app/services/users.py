@@ -3,49 +3,48 @@ from ..exceptions.user_exception import UserException
 from .. import schemas
 from ..models.Users import User
 # from .roles import get_none_admin_role
-import re
+from ..dto import CreateUserInputSchema, GetAllUsersOutputSchema, GetUserOutputSchema, UserSchema
 
 class UserService:
 
-    def get(user_id: int):
-        get_user = User.find_one(id=user_id, status='active')
+    def get(db: Session, user_id: int):
+        get_user = User.find_one(db=db, id = user_id, status = 'active')
 
         if not get_user:
             UserException.not_found()
 
-        response = {}
-        response['success'] = True
-        response['message'] = "User fetched successfully"
-        response['payload'] = get_user.__dict__
+        response = GetUserOutputSchema(
+            success = True,
+            message = "User was obtained successfully",
+            payload = UserSchema.model_validate(get_user)
+        )
 
         return response
 
 
-    def get_all(skip: int = 0, limit: int = 10):
-        get_all_users = User.find(limit=limit, skip=skip)
+    def get_all(db: Session):
+        get_all_users = User.find(db=db)
 
-        users = []
-        for user in get_all_users:
-            users.append(user.__dict__)
+        if not get_all_users:
+            UserException.users_not_found()
 
-        response = {}
-        response['success'] = True
-        response['message'] = "Users was obtained successfully"
-        response['payload'] = users
-
+        response = GetAllUsersOutputSchema(
+            success=True,
+            message="Users were obtained successfully",
+            payload=[UserSchema.model_validate(user) for user in get_all_users]
+        )
         return response
 
-    def create(body: schemas.UserCreate):
-        exist = User.find_one(email=body['email'], status='active')
+    def create(db: Session, body: CreateUserInputSchema):
+        body = body.model_dump(exclude_unset=True)
+        exist = User.find_one(db=db, email=body['email'], status='active')
         if exist:
             UserException.user_exist()
-
-        new_user = User.save(**body)
+        new_user = User.save(db = db, **body)
 
         if not new_user:
             UserException.not_created()
-
-        user = User.find_one(id=new_user.id)
+        user = User.find_one(db=db, id=new_user.id)
 
         response = {}
         response['success'] = True
