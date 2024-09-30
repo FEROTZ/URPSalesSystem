@@ -76,7 +76,7 @@ class Role(Base):
                     "deleted_at" : datetime.now()
                 }, synchronize_session="fetch")
             )
-            db.commit(delete_user)
+            db.commit()
             return delete_user
         except exc.SQLAlchemyError as error:
             print(error)

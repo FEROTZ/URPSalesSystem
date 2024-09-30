@@ -9,7 +9,8 @@ from ..dto import (
     GetAllRolesOutputSchema,
     GetRoleOutputSchema,
     UpdateRoleOutputSchema,
-    UpdateRoleInputSchema
+    UpdateRoleInputSchema,
+    DeleteRoleOutputSchema
 )
 
 
@@ -31,3 +32,7 @@ class Role():
     @router.put('/{role_id}', response_model = UpdateRoleOutputSchema, status_code = status.HTTP_200_OK)
     def update_role(role_id: int, body: UpdateRoleInputSchema, db: Session = Depends(get_db)):
         return RoleService.update(db = db, role_id = role_id, body = body)
+
+    @router.delete('/{role_id}', response_model = DeleteRoleOutputSchema, status_code = status.HTTP_200_OK)
+    def delete_role(role_id: int, db: Session = Depends(get_db)):
+        return RoleService.deactive_role(db = db, role_id = role_id)

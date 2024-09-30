@@ -13,3 +13,4 @@ from .output.role_schema_output_dto import RoleSchema
 from .output.get_all_roles_output_dto import GetAllRolesOutputSchema
 from .output.get_role_output_dto import GetRoleOutputSchema
 from .output.update_role_output_dto import UpdateRoleOutputSchema
+from .output.delete_role_output_dto import DeleteRoleOutputSchema

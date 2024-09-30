@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
 from ..exceptions.role_exception import RoleException
 from ..models.Roles import Role
-# from ..models import Role as model
-# from ..schemas import Role as schema
 from ..dto import (
     CreateRoleInputSchema,
     GetAllRolesOutputSchema,
@@ -90,14 +88,25 @@ class RoleService:
 
         return response
 
-# def delete_role(db: Session, role_id: int):
-#     role = get_role(db, role_id=role_id)
+    def deactive_role(db: Session, role_id: int):
+        get_role = Role.find_one(db = db, id = role_id, status = 'active')
 
-#     role.status = schema.RoleStatusType.inactive
-#     db.commit()
-#     db.refresh(role)
-#     return role
+        if not get_role:
+            RoleException.not_found()
 
+        Role.delete(db = db, id = role_id)
+
+        role = Role.find_one(db = db, id = role_id, status = 'inactive')
+
+        if not role:
+            RoleException.not_deleted()
+
+        response = {}
+        response['success'] = True
+        response['message'] = "Role deleted successfully"
+        response['payload'] = role.__dict__
+
+        return response
 
 # def get_none_admin_role(db: Session):
 #     non_admin_roles = db.query(model).filter(model.name != 'admin').all()
