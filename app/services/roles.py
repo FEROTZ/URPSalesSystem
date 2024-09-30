@@ -3,7 +3,7 @@ from ..exceptions.role_exception import RoleException
 from ..models.Roles import Role
 # from ..models import Role as model
 # from ..schemas import Role as schema
-from ..dto import CreateRoleInputSchema
+from ..dto import CreateRoleInputSchema, GetAllRolesOutputSchema, RoleSchema
 # import random
 
 class RoleService:
@@ -11,8 +11,19 @@ class RoleService:
 #     return db.query(model).filter(model.id == role_id, model.status == 'active').first()
 
 
-# def get_roles(db: Session, skip: int = 0, limit: int = 10):
-#     return db.query(model).filter(model.status == 'active').offset(skip).limit(limit).all()
+    def get_all(db: Session):
+        get_all_roles = Role.find(db = db)
+
+        if not get_all_roles:
+            RoleException.roles_not_found()
+
+        response = GetAllRolesOutputSchema(
+            success = True,
+            message = "Users were obtained successfully",
+            payload = [RoleSchema.model_validate(role) for role in get_all_roles]
+        )
+
+        return response
 
 
 # def get_role_by_name(db: Session, name: str):

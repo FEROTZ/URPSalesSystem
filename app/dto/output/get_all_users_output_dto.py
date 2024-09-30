@@ -1,7 +1,6 @@
 from pydantic import Field, ConfigDict, BaseModel
 from .get_user_output_dto import UserSchema
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 class GetAllUsersOutputSchema(BaseModel):
     success: bool = Field(..., description="True if action was successful")
