@@ -55,6 +55,10 @@ class UserService:
 
     def update(db: Session, user_id: int, body: UpdateUserInputSchema):
         body = body.model_dump(exclude_unset=True)
+
+        if not body:
+            UserException.not_updated()
+
         user = User.find_one(db=db, id = user_id, status = 'active')
         if not user:
             UserException.not_found()
@@ -68,7 +72,7 @@ class UserService:
         if not update_user:
             UserException.not_updated()
         user = User.find_one(db=db, id = user_id, status = 'active')
-
+        print(user.__dict__)
         response = {}
         response['success'] = True
         response['message'] = "User updated successfully"

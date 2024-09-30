@@ -3,7 +3,13 @@ from ..exceptions.role_exception import RoleException
 from ..models.Roles import Role
 # from ..models import Role as model
 # from ..schemas import Role as schema
-from ..dto import CreateRoleInputSchema, GetAllRolesOutputSchema, RoleSchema, GetRoleOutputSchema
+from ..dto import (
+    CreateRoleInputSchema,
+    GetAllRolesOutputSchema,
+     RoleSchema,
+     GetRoleOutputSchema,
+     UpdateRoleInputSchema
+)
 # import random
 
 class RoleService:
@@ -60,17 +66,29 @@ class RoleService:
 
 
 
-# def update_role(db: Session, role_id: int, role_update: schema.RoleUpdate):
-#     role = get_role(db, role_id=role_id)
+    def update(db: Session, role_id: int, body: UpdateRoleInputSchema):
+        body = body.model_dump(exclude_unset=True)
 
-#     update_role = role_update.model_dump(exclude_unset=True)
+        if not body:
+            RoleException.not_updated()
 
-#     for key, value in update_role.items():
-#         setattr(role, key, value)
-#     db.commit()
-#     db.refresh(role)
-#     return role
+        get_role = Role.find_one(db = db, id = role_id, status = 'active'  )
 
+        if not get_role:
+            RoleException.not_found()
+
+        role_update = Role.update(db = db, role_id = role_id, **body)
+
+        if not role_update:
+            RoleException.not_updated()
+        role = Role.find_one(db = db, id = role_id, status = 'active')
+
+        response = {}
+        response['success'] = True
+        response['message'] = "Role updated successfully"
+        response['payload'] = role.__dict__
+
+        return response
 
 # def delete_role(db: Session, role_id: int):
 #     role = get_role(db, role_id=role_id)

@@ -45,20 +45,23 @@ class Role(Base):
             print(error)
             return {}
 
-    def update(db: Session, **body):
+    def update(db: Session, role_id: int, **body):
         try:
             update_role = (
                 db.query(Role)
                 .filter_by(
-                    id = int(body['id']),
+                    id = role_id,
                     status = 'active'
                 )
                 .update(body, synchronize_session="fetch")
             )
-            db.commit(update_role)
+            db.commit()
+
+            return update_role
         except Exception as error:
             print(error)
             db.rollback()
+            return {}
 
     def delete(db: Session, **kwargs):
         try:

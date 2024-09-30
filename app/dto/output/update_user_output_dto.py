@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from.user_schema_output_dto import UserSchema
+from .user_schema_output_dto import UserSchema
 
 class UpdateUserOutputSchema(BaseModel):
     success: bool = Field(..., description="User updated successfully")
