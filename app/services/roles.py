@@ -1,10 +1,12 @@
-# from sqlalchemy.orm import Session
-# # from .. import models, schemas
+from sqlalchemy.orm import Session
+from ..exceptions.role_exception import RoleException
+from ..models.Roles import Role
 # from ..models import Role as model
 # from ..schemas import Role as schema
+from ..dto import CreateRoleInputSchema
 # import random
 
-
+class RoleService:
 # def get_role(db: Session, role_id: int):
 #     return db.query(model).filter(model.id == role_id, model.status == 'active').first()
 
@@ -18,15 +20,26 @@
 #         model.name == name,
 #     ).first()
 
-# def create_role(db: Session, role: schema.RoleCreate):
-#     new_role = model(
-#         name=role.name,
-#         description=role.description if role.description else None,
-#     )
-#     db.add(new_role)
-#     db.commit()
-#     db.refresh(new_role)
-#     return new_role
+    def create(db: Session, body: CreateRoleInputSchema):
+        body = body.model_dump(exclude_unset=True)
+        exist = Role.find_one(db = db, name = body['name'])
+        if exist:
+            RoleException.role_exist()
+
+        new_role = Role.save(db = db, **body)
+
+        if not new_role:
+            RoleException.not_created()
+
+        role = Role.find_one(db = db, id = new_role.id)
+
+        response = {}
+        response['success'] = True
+        response['message'] = "Role created successfully"
+        response['payload'] = role.__dict__
+
+        return response
+
 
 
 # def update_role(db: Session, role_id: int, role_update: schema.RoleUpdate):
