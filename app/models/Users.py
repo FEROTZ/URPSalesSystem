@@ -31,8 +31,6 @@ class User(Base):
     def role_name(self):
         return self.role.name
 
-    # def __repr__(self):
-    #     return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
 
     def save(db:Session, **kwargs):
         try:
