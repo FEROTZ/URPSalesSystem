@@ -5,6 +5,9 @@ class UserException:
     def not_found():
         Error("User not found or inactive", 404)
 
+    def users_not_found():
+        Error("No users found", 404)
+
     def user_exist():
         Error("User with this email already exists", 409)
 
