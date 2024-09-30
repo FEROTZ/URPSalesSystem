@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 # from ..core.auth import authenticate_user, create_access_token, oauth2_scheme
-from ..dto import *
+from ..dto import GetAllUsersOutputSchema, GetUserOutputSchema, CreateUserOutputSchema, CreateUserInputSchema, UpdateUserOutputSchema, UpdateUserInputSchema, DeleteUserOutputSchema
 from app.services.users import UserService
 from ..database import get_db
 
