@@ -1,9 +1,15 @@
 from sqlalchemy.orm import Session
 from ..exceptions.user_exception import UserException
-from .. import schemas
 from ..models.Users import User
+from .roles import RoleService
 from ..utils.validate_attribute import validateAttribute
-from ..dto import CreateUserInputSchema, GetAllUsersOutputSchema, GetUserOutputSchema, UserSchema, UpdateUserInputSchema
+from ..dto import (
+    CreateUserInputSchema,
+    GetAllUsersOutputSchema,
+    GetUserOutputSchema,
+    UserSchema,
+    UpdateUserInputSchema
+)
 
 class UserService:
 
@@ -40,6 +46,9 @@ class UserService:
         exist = User.find_one(db=db, email=body['email'], status='active')
         if exist:
             UserException.user_exist()
+
+        get_role = RoleService.get_none_admin_role(db = db)
+        body['role_id'] = get_role.id
         new_user = User.save(db = db, **body)
 
         if not new_user:

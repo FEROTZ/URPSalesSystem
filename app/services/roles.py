@@ -8,7 +8,6 @@ from ..dto import (
      GetRoleOutputSchema,
      UpdateRoleInputSchema
 )
-# import random
 
 class RoleService:
 
@@ -108,6 +107,5 @@ class RoleService:
 
         return response
 
-# def get_none_admin_role(db: Session):
-#     non_admin_roles = db.query(model).filter(model.name != 'admin').all()
-#     return random.choice(non_admin_roles) if non_admin_roles else None
+    def get_none_admin_role(db: Session):
+        return Role.get_random_non_admin_role(db = db)

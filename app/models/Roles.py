@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Enum, DateTime, exc
 from sqlalchemy.orm import relationship, Session
+from sqlalchemy.sql.expression import func
 from datetime import datetime
 from ..database import Base
 
@@ -82,3 +83,13 @@ class Role(Base):
             print(error)
             db.rollback()
             return {}
+
+    def get_random_non_admin_role(db: Session):
+        try:
+            return db.query(Role).filter(
+                Role.status == 'active',
+                Role.name != 'admin'
+            ).order_by(func.random()).first()
+        except Exception as error:
+            print(error)
+            return None
