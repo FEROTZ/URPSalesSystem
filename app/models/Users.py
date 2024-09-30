@@ -68,15 +68,16 @@ class User(Base):
         finally:
             pass
 
-    def update(**update):
+    def update(db: Session, user_id : int, **body):
         try:
-            user = (
-                db.query(User).filter_by(id=str(update["id"]))
-                .update(update, synchronize_session="fetch")
+            update_user = (
+                db.query(User).
+                filter_by(id = user_id, status = 'active')
+                .update(body, synchronize_session="fetch")
             )
             db.commit()
-            db.refresh(user)
-            return user
+
+            return update_user
         except Exception as error:
             print(error)
             db.rollback()

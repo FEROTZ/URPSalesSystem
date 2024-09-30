@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from ..exceptions.user_exception import UserException
 from .. import schemas
 from ..models.Users import User
-# from .roles import get_none_admin_role
-from ..dto import CreateUserInputSchema, GetAllUsersOutputSchema, GetUserOutputSchema, UserSchema
+from ..utils.validate_attribute import validateAttribute
+from ..dto import CreateUserInputSchema, GetAllUsersOutputSchema, GetUserOutputSchema, UserSchema, UpdateUserInputSchema
 
 class UserService:
 
@@ -53,28 +53,28 @@ class UserService:
 
         return response
 
-    # def update(body: schemas.UserUpdate):
-    #     get_user = User.find_one(id = body['id'])
-    #     if not get_user:
-    #         UserException.not_found()
+    def update(db: Session, user_id: int, body: UpdateUserInputSchema):
+        body = body.model_dump(exclude_unset=True)
+        user = User.find_one(db=db, id = user_id, status = 'active')
+        if not user:
+            UserException.not_found()
 
-    #     if validateAttribute(body, 'active'):
-    #         body['deleted_at'] = None
-    #         if not body['active']:
-    #             body['deleted_at'] = datetime.now()
+        if validateAttribute(body, 'password'):
+            hashed_password = User.hash_password(body['password'])
+            body['password'] = hashed_password
 
-    #     update_user = User.update(**body)
-    #     update_user = user_update.model_dump(exclude_unset=True)
+        update_user = User.update(db = db, user_id = user_id, **body)
 
-    #     if 'password' in update_user:
-    #         update_user['password'] = hash_password(update_user['password'])
+        if not update_user:
+            UserException.not_updated()
+        user = User.find_one(db=db, id = user_id, status = 'active')
 
-    #     for key, value in update_user.items():
-    #         setattr(user, key, value)
+        response = {}
+        response['success'] = True
+        response['message'] = "User updated successfully"
+        response['payload'] = user.__dict__
 
-    #     db.commit()
-    #     db.refresh(user)
-    #     return user
+        return response
 
     # def deactive_user(db: Session, user_id: int):
     #     user = db.query(models.User).filter(models.User.id == user_id).first()

@@ -27,20 +27,9 @@ class User():
         return UserService.create(body = body, db = db)
 
 
-    # @router.put('/{user_id}', response_model=UserResponse)
-    # async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
-    #     if user_update.password:
-    #         password_validation = UserService.validate_password(user_update.password)
-
-    #         if not password_validation['valid']:
-    #             raise HTTPException(status_code=400, detail=password_validation['message'])
-
-    #     return UserService.update_user(db, user_id=user_id, user_update=user_update)
-
-    #     if not update_user:
-    #         raise HTTPException(status_code=404, detail="User not found.")
-
-    #     return update_user
+    @router.put('/{user_id}', response_model = UpdateUserOutputSchema, status_code = status.HTTP_200_OK)
+    def update_user(user_id: int, body: UpdateUserInputSchema, db: Session = Depends(get_db)):
+        return UserService.update(db = db, user_id = user_id, body = body)
 
 
     # @router.delete('/{user_id}', response_model=UserInactiveResponse)
