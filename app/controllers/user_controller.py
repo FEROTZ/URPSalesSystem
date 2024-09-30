@@ -5,9 +5,7 @@ from datetime import timedelta
 # from ..core.auth import authenticate_user, create_access_token, oauth2_scheme
 from ..dto import *
 from app.services.users import UserService
-from app.schemas import UserResponse, UserCreate, Token, UserUpdate, UserInactiveResponse
 from ..database import get_db
-from typing import List
 
 
 class User():
@@ -32,14 +30,9 @@ class User():
         return UserService.update(db = db, user_id = user_id, body = body)
 
 
-    # @router.delete('/{user_id}', response_model=UserInactiveResponse)
-    # def delete_user(user_id: int, db: Session = Depends(get_db)):
-        # user = UserService.deactive_user(db, user_id=user_id)
-
-        # if not user:
-        #     raise HTTPException(status_code=404, detail="User not found.")
-
-        # return user
+    @router.delete('/{user_id}', response_model = DeleteUserOutputSchema, status_code = status.HTTP_200_OK)
+    def delete_user(user_id: int, db: Session = Depends(get_db)):
+        return UserService.deactive_user(db = db, user_id = user_id)
 
 
     # @router.post('/login', response_model=Token)

@@ -76,15 +76,20 @@ class UserService:
 
         return response
 
-    # def deactive_user(db: Session, user_id: int):
-    #     user = db.query(models.User).filter(models.User.id == user_id).first()
-    #     if not user:
-    #         return None
+    def deactive_user(db: Session, user_id: int):
+        get_user = User.find_one(db=db, id = user_id, status = 'active')
+        if not get_user:
+            UserException.not_found()
 
-    #     if user.status == schemas.UserStatusType.inactive:
-    #         return user
+        User.delete(db = db, id = user_id)
 
-    #     user.status = schemas.UserStatusType.inactive
-    #     db.commit()
-    #     db.refresh(user)
-    #     return user
+        user = User.find_one(db=db, id = user_id, status = 'inactive')
+        if not user:
+            UserException.not_deleted()
+
+        response = {}
+        response['success'] = True
+        response['message'] = "User deleted successfully"
+        response['payload'] = user.__dict__
+
+        return response

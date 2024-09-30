@@ -83,18 +83,18 @@ class User(Base):
             db.rollback()
             return {}
 
-    def delete(**kwargs):
+    def delete(db: Session, **kwargs):
         try:
-            user = (
-                db.query(User).filter_by(**kwargs)
+            delete_user = (
+                db.query(User)
+                .filter_by(**kwargs)
                 .update({
                     "status": "inactive",
                     "deleted_at": datetime.now(),
                 },synchronize_session="fetch")
             )
             db.commit()
-            db.refresh(user)
-            return user
+            return delete_user
         except exc.SQLAlchemyError as error:
             print(error)
             db.rollback()
