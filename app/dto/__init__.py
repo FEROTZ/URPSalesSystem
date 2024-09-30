@@ -10,3 +10,4 @@ from .output.delete_user_output_dto import *
 from .output.create_role_output_dto import CreateRoleOutputSchema
 from .output.role_schema_output_dto import RoleSchema
 from .output.get_all_roles_output_dto import GetAllRolesOutputSchema
+from .output.get_role_output_dto import GetRoleOutputSchema
