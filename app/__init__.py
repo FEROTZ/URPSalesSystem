@@ -21,13 +21,13 @@ def create_app():
     from .controllers import (
         User,
         Role,
-        # Permission,
+        Permission,
         # RolePermission,
     )
 
     app.include_router(User.router, prefix="/users", tags=["Users"])
     app.include_router(Role.router, prefix="/roles", tags=["Roles"])
-    # app.include_router(Permission.router, prefix="/api/v1/permissions", tags=["Permissions"])
+    app.include_router(Permission.router, prefix="/api/v1/permissions", tags=["Permissions"])
 
 
     # db.create_all()  # Create database tables for our data models

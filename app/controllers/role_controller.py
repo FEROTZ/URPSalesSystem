@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.services.roles import RoleService
 from ..database import get_db
 from ..dto import (
-    RoleSchema,
     CreateRoleInputSchema,
     CreateRoleOutputSchema,
     GetAllRolesOutputSchema,

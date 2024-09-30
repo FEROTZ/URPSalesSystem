@@ -4,9 +4,9 @@ from ..models.Roles import Role
 from ..dto import (
     CreateRoleInputSchema,
     GetAllRolesOutputSchema,
-     RoleSchema,
-     GetRoleOutputSchema,
-     UpdateRoleInputSchema
+    RoleSchema,
+    GetRoleOutputSchema,
+    UpdateRoleInputSchema
 )
 
 class RoleService:

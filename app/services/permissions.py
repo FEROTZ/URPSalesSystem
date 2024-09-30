@@ -1,56 +1,29 @@
-# from sqlalchemy.orm import Session
-# from ..models import Permission as model
-# from ..schemas import Permission as schema
+from sqlalchemy.orm import Session
+from ..exceptions.permission_exception import PermissionException
+from ..models.Permissions import Permission
+from ..dto import (
+    CreatePermissionInputSchema,
+)
 
+class PermissionService:
 
-# def get_permission(db: Session, permission_id:int):
-#     return db.query(model).filter(
-#         model.id == permission_id,
-#         model.status == 'active'
-#     ).first()
+    def create(db: Session, body: CreatePermissionInputSchema):
+        body = body.model_dump(exclude_unset=True)
 
+        exist = Permission.find_one(db = db, name = body['name'])
+        if exist:
+            PermissionException.permission_exist()
 
-# def get_permissions(db: Session, skip: int = 0, limit: int = 10):
-#     return db.query(model).filter(
-#         model.status == 'active'
-#     ).offset(skip).limit(limit).all()
+        new_permission = Permission.save(db = db, **body)
 
+        if not new_permission:
+            PermissionException.not_created()
 
-# def create_permission(db: Session, permission: schema.PermissionCreate):
-#     new_permission = model(
-#         name = permission.name,
-#         description = permission.description if permission.description else None
-#     )
-#     db.add(new_permission)
-#     db.commit()
-#     db.refresh(new_permission)
+        permission = Permission.find_one(db = db, id = new_permission.id)
 
-#     return new_permission
+        response = {}
+        response['success'] = True
+        response['message'] = "Permission created successfully"
+        response['payload'] = permission.__dict__
 
-
-# def update_permission(db: Session, permission_id:int, permission_update: schema.PermissionUpdate):
-#     permission = get_permission(db, permission_id=permission_id)
-
-#     request = permission_update.model_dump(exclude_unset=True)
-
-#     for key, value in request.items():
-#         setattr(permission, key, value)
-
-#     db.commit()
-#     db.refresh(permission)
-#     return permission
-
-
-# def delete_permission(db: Session, permission_id: int):
-#     permission = get_permission(db, permission_id=permission_id)
-
-#     permission.status = schema.PermissionStatusType.inactive
-#     db.commit()
-#     db.refresh(permission)
-#     return permission
-
-
-# def get_permission_by_name(db: Session, name: str):
-#     return db.query(model).filter(
-#         model.name == name,
-#     ).first()
+        return response

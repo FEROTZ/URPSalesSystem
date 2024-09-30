@@ -2,6 +2,7 @@ from .input.create_user_input_dto import *
 from .input.update_user_input_dto import *
 from .input.create_role_input_dto import CreateRoleInputSchema
 from .input.update_role_input_dto import UpdateRoleInputSchema
+from .input.create_permission_input_dto import CreatePermissionInputSchema
 from .output.get_user_output_dto import *
 from .output.user_schema_output_dto import *
 from .output.create_user_output_dto import *
@@ -14,3 +15,5 @@ from .output.get_all_roles_output_dto import GetAllRolesOutputSchema
 from .output.get_role_output_dto import GetRoleOutputSchema
 from .output.update_role_output_dto import UpdateRoleOutputSchema
 from .output.delete_role_output_dto import DeleteRoleOutputSchema
+from .output.create_permission_output_dto import CreatePermissionOutputSchema
+from .output.permission_schema_output_dto import PermissionSchema
