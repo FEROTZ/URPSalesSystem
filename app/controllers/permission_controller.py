@@ -6,7 +6,9 @@ from ..dto import (
     CreatePermissionInputSchema,
     CreatePermissionOutputSchema,
     GetAllPermissionsOutputSchema,
-    GetPermissionOutputSchema
+    GetPermissionOutputSchema,
+    UpdatePermissionInputSchema,
+    UpdatePermissionOutputSchema
 )
 
 
@@ -25,3 +27,7 @@ class Permission:
     @router.post('/create', response_model=CreatePermissionOutputSchema, status_code=status.HTTP_201_CREATED)
     def create_permission(body: CreatePermissionInputSchema, db: Session = Depends(get_db)):
         return PermissionService.create(db = db, body = body)
+
+    @router.put('/{permission_id}', response_model=UpdatePermissionOutputSchema, status_code=status.HTTP_200_OK)
+    def update_permission(permission_id: int, body: UpdatePermissionInputSchema, db: Session = Depends(get_db)):
+        return PermissionService.update(db = db, permission_id = permission_id, body = body)

@@ -3,6 +3,7 @@ from .input.update_user_input_dto import *
 from .input.create_role_input_dto import CreateRoleInputSchema
 from .input.update_role_input_dto import UpdateRoleInputSchema
 from .input.create_permission_input_dto import CreatePermissionInputSchema
+from .input.update_permission_input_dto import UpdatePermissionInputSchema
 from .output.get_user_output_dto import *
 from .output.user_schema_output_dto import *
 from .output.create_user_output_dto import *
@@ -19,3 +20,4 @@ from .output.create_permission_output_dto import CreatePermissionOutputSchema
 from .output.permission_schema_output_dto import PermissionSchema
 from .output.get_permission_output_dto import GetPermissionOutputSchema
 from .output.get_all_permissions_output_dto import GetAllPermissionsOutputSchema
+from .output.update_permission_output_dto import UpdatePermissionOutputSchema

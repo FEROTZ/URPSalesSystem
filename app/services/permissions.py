@@ -5,7 +5,8 @@ from ..dto import (
     CreatePermissionInputSchema,
     PermissionSchema,
     GetAllPermissionsOutputSchema,
-    GetPermissionOutputSchema
+    GetPermissionOutputSchema,
+    UpdatePermissionInputSchema,
 )
 
 class PermissionService:
@@ -56,5 +57,30 @@ class PermissionService:
         response['success'] = True
         response['message'] = "Permission created successfully"
         response['payload'] = permission.__dict__
+
+        return response
+
+    def update(db: Session, permission_id: int, body: UpdatePermissionInputSchema):
+        body = body.model_dump(exclude_unset=True)
+
+        if not body:
+            PermissionException.not_updated()
+
+        get_permission = Permission.find_one(db = db, id = permission_id, status = 'active')
+
+        if not get_permission:
+            PermissionException.not_found()
+
+        permission_update = Permission.update(db = db, permission_id = permission_id, **body)
+
+        if not permission_update:
+            PermissionException.not_updated()
+
+        permission = Permission.find_one(db = db, id = permission_id, status = 'active')
+
+        response = {}
+        response['success'] = True
+        response['message'] = "Permission updated successfully"
+        response['payload'] = get_permission.__dict__
 
         return response
