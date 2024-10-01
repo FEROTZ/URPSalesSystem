@@ -48,7 +48,9 @@ class UserService:
             UserException.user_exist()
 
         get_role = RoleService.get_none_admin_role(db = db)
-        body['role_id'] = get_role.id
+        if get_role:
+            body['role_id'] = get_role.id
+
         new_user = User.save(db = db, **body)
 
         if not new_user:
@@ -105,4 +107,23 @@ class UserService:
         response['message'] = "User deleted successfully"
         response['payload'] = user.__dict__
 
+        return response
+
+    def change_role(db: Session, user_id: int, body: UpdateUserInputSchema):
+        body = body.model_dump(exclude_unset=True)
+
+        get_role = RoleService.get(db = db, role_id = body['role_id'])
+
+        update_role = User.update(db = db, user_id = user_id, role_id = body['role_id'])
+
+        if not update_role:
+            UserException.not_updated()
+
+        user = User.find_one(db=db, id = user_id, status = 'active')
+
+        response = GetUserOutputSchema(
+            success = True,
+            message = "User role updated successfully",
+            payload = UserSchema.model_validate(user)
+        )
         return response

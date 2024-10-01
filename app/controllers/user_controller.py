@@ -1,11 +1,18 @@
 from fastapi import APIRouter, Depends, status
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
-# from ..core.auth import authenticate_user, create_access_token, oauth2_scheme
-from ..dto import GetAllUsersOutputSchema, GetUserOutputSchema, CreateUserOutputSchema, CreateUserInputSchema, UpdateUserOutputSchema, UpdateUserInputSchema, DeleteUserOutputSchema
 from app.services.users import UserService
 from ..database import get_db
+from ..dto import (
+    GetAllUsersOutputSchema,
+    GetUserOutputSchema,
+    CreateUserOutputSchema,
+    CreateUserInputSchema,
+    UpdateUserOutputSchema,
+    UpdateUserInputSchema,
+    DeleteUserOutputSchema,
+    ChangeUserRoleInputSchema,
+    ChangeUserRoleOutputSchema
+ )
 
 
 class User():
@@ -33,6 +40,10 @@ class User():
     @router.delete('/{user_id}', response_model = DeleteUserOutputSchema, status_code = status.HTTP_200_OK)
     def delete_user(user_id: int, db: Session = Depends(get_db)):
         return UserService.deactive_user(db = db, user_id = user_id)
+
+    @router.put('/change-role/{user_id}', response_model = ChangeUserRoleOutputSchema, status_code = status.HTTP_200_OK)
+    def change_user_role(user_id: int, body: ChangeUserRoleInputSchema, db: Session = Depends(get_db)):
+        return UserService.change_role(db = db, user_id = user_id, body = body)
 
 
     # @router.post('/login', response_model=Token)
