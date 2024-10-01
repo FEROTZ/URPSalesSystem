@@ -12,6 +12,7 @@ class Permission(Base):
     status = Column(Enum('active', 'inactive', name="permission_status_type"), default='active')
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    deleted_at = Column(DateTime, nullable=True)
 
     roles = relationship('Role', secondary='roles_permissions', back_populates='permissions')
 

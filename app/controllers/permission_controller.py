@@ -8,7 +8,8 @@ from ..dto import (
     GetAllPermissionsOutputSchema,
     GetPermissionOutputSchema,
     UpdatePermissionInputSchema,
-    UpdatePermissionOutputSchema
+    UpdatePermissionOutputSchema,
+    DeletePermissionOutputSchema
 )
 
 
@@ -31,3 +32,7 @@ class Permission:
     @router.put('/{permission_id}', response_model=UpdatePermissionOutputSchema, status_code=status.HTTP_200_OK)
     def update_permission(permission_id: int, body: UpdatePermissionInputSchema, db: Session = Depends(get_db)):
         return PermissionService.update(db = db, permission_id = permission_id, body = body)
+
+    @router.delete('/{permission_id}', response_model = DeletePermissionOutputSchema, status_code=status.HTTP_200_OK)
+    def delete_permission(permission_id: int, db: Session = Depends(get_db)):
+        return PermissionService.deactive_permission(db = db, permission_id = permission_id)

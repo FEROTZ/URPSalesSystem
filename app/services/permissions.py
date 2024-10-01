@@ -84,3 +84,23 @@ class PermissionService:
         response['payload'] = get_permission.__dict__
 
         return response
+
+    def deactive_permission(db: Session, permission_id: int):
+        get_permission = Permission.find_one(db = db, id = permission_id, status = 'active')
+
+        if not get_permission:
+            PermissionException.not_found()
+
+        Permission.delete(db = db, id = permission_id)
+
+        permission_deleted = Permission.find_one(db = db, id = permission_id, status = 'inactive')
+
+        if not permission_deleted:
+            PermissionException.not_deleted()
+
+        response = {}
+        response['success'] = True
+        response['message'] = "Permission deleted successfully"
+        response['payload'] = get_permission.__dict__
+
+        return response

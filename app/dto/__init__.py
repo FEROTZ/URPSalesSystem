@@ -21,3 +21,4 @@ from .output.permission_schema_output_dto import PermissionSchema
 from .output.get_permission_output_dto import GetPermissionOutputSchema
 from .output.get_all_permissions_output_dto import GetAllPermissionsOutputSchema
 from .output.update_permission_output_dto import UpdatePermissionOutputSchema
+from .output.delete_permission_output_dto import DeletePermissionOutputSchema
