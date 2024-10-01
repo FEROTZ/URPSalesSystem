@@ -17,3 +17,5 @@ from .output.update_role_output_dto import UpdateRoleOutputSchema
 from .output.delete_role_output_dto import DeleteRoleOutputSchema
 from .output.create_permission_output_dto import CreatePermissionOutputSchema
 from .output.permission_schema_output_dto import PermissionSchema
+from .output.get_permission_output_dto import GetPermissionOutputSchema
+from .output.get_all_permissions_output_dto import GetAllPermissionsOutputSchema

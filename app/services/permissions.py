@@ -3,9 +3,40 @@ from ..exceptions.permission_exception import PermissionException
 from ..models.Permissions import Permission
 from ..dto import (
     CreatePermissionInputSchema,
+    PermissionSchema,
+    GetAllPermissionsOutputSchema,
+    GetPermissionOutputSchema
 )
 
 class PermissionService:
+
+    def get(db: Session, permission_id: int):
+        get_permission = Permission.find_one(db = db, id = permission_id, status = 'active')
+
+        if not get_permission:
+            PermissionException.not_found()
+
+        response = GetPermissionOutputSchema(
+            success = True,
+            message = "Permission was obtained successfully",
+            payload = PermissionSchema.model_validate(get_permission)
+        )
+
+        return response
+
+    def get_all(db: Session):
+        get_all_permissions = Permission.find(db = db)
+
+        if not get_all_permissions:
+            PermissionException.permissions_not_found()
+
+        response = GetAllPermissionsOutputSchema(
+            success = True,
+            message = "Permissions were obtained successfully",
+            payload = [PermissionSchema.model_validate(permission) for permission in get_all_permissions]
+        )
+
+        return response
 
     def create(db: Session, body: CreatePermissionInputSchema):
         body = body.model_dump(exclude_unset=True)
